@@ -31,10 +31,9 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: us-east-1   
         
-    - name: Configure kubeconfig for EKS
-      uses: aws-actions/amazon-eks-login@v1
-      with:
-        cluster-name: devops-project-cluster    
+    - name: Configure kubeconfig for AWS EKS
+      run: |
+        aws eks --region us-east-1 update-kubeconfig --name devops-project-cluster    
 
     - name: Apply Kubernetes manifests
       run: |
