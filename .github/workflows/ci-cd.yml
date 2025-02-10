@@ -1,0 +1,36 @@
+name: CI/CD Pipeline for Node.js App
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v2
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+
+    - name: Log in to Amazon ECR
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Build, tag, and push Docker image to ECR
+      run: |
+        docker build -t 767397730116.dkr.ecr.us-east-1.amazonaws.com/node-app:latest .
+        docker push 767397730116.dkr.ecr.us-east-1.amazonaws.com/node-app:latest
+
+    - name: Set up kubectl
+      uses: aws-actions/configure-kubeconfig@v1
+      with:
+        region: us-east-1
+        cluster-name: devops-project-cluster
+
+    - name: Apply Kubernetes manifests
+      run: |
+        kubectl apply -f app-deployment.yaml
+        kubectl apply -f app-service.yaml
